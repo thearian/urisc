@@ -1,4 +1,4 @@
-pub const MEMORY_SIZE: i8 = 4;
+pub const MEMORY_SIZE: u8 = 4;
 
 pub struct Memory {
     value: [i8; MEMORY_SIZE as usize]
@@ -16,10 +16,10 @@ impl Memory {
 }
 
 pub struct Pointer {
-    value: i8
+    value: u8
 }
 impl Pointer {
-    pub fn new(value: i8) -> Pointer {
+    pub fn new(value: u8) -> Pointer {
         if value > MEMORY_SIZE {
             panic!("Memory overflow: attempt to create pointer of {}", value)
         }
@@ -31,5 +31,8 @@ impl Pointer {
     pub fn display(&self) -> String {
         format!("ptr {}", self.value)
     } 
+    pub fn reference(&self) -> u8 {
+        self.value
+    }
 }
 

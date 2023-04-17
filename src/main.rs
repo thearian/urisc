@@ -26,6 +26,21 @@ fn instruction(memory: &mut Memory, a: Pointer, b: Pointer, c: Pointer) -> Point
     return c.next()
 }
 
+fn assemble(instructions: Vec<Instruction>) -> Assembly {
+    let mut assembly: Assembly = Vec::new();
+    for ins in instructions {
+        let asm: AssemblyItem = match ins {
+            Instruction::GOTO(pointer) => [0, 0, pointer.reference()]
+        };
+        assembly.push(asm);
+    }
+    return assembly;
+}
+
+enum Instruction {
+ GOTO(Pointer)
+}
+
 fn link(assembly: Assembly) -> Binary {
     let mut binary = Binary::new();
 
