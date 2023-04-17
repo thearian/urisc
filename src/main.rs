@@ -2,7 +2,7 @@ mod memory;
 use memory::{Memory, Pointer};
 
 fn main() {
-    let code = "goto 2".to_owned();
+    let code = "add 1 2\ngoto 3".to_owned();
     let bin = link(
         assemble(
             compile(code)
@@ -40,6 +40,20 @@ fn compile(code: String) -> Vec<Instruction> {
                             )
                         )
                     );
+                },
+                "add" => {
+                    instructions.push(
+                        Instruction::ADD(
+                            Pointer::new(
+                                tokens[t+1].parse::<u8>()
+                                    .expect("add arg is not number of pointer")
+                            ),
+                            Pointer::new(
+                                tokens[t+2].parse::<u8>()
+                                    .expect("add arg is not number of pointer")
+                            )
+                        )
+                    );
                 }
                 _ => {}
             }
@@ -52,16 +66,30 @@ fn compile(code: String) -> Vec<Instruction> {
 fn assemble(instructions: Vec<Instruction>) -> Assembly {
     let mut assembly: Assembly = Vec::new();
     for ins in instructions {
-        let asm: AssemblyItem = match ins {
-            Instruction::GOTO(pointer) => [0, 0, pointer.reference()]
+        match ins {
+            Instruction::GOTO(pointer) => {
+                assembly.push(
+                    [0, 0, pointer.reference()]
+                );
+            }
+            Instruction::ADD(a, b) => {
+                assembly = [
+                    assembly,
+                    vec![
+                        [a.reference(), 0, 0],
+                        [0, b.reference(), 0],
+                        [0, 0, 0]
+                    ]
+                ].concat()
+            }
         };
-        assembly.push(asm);
     }
     return assembly;
 }
 
 enum Instruction {
- GOTO(Pointer)
+ GOTO(Pointer),
+ ADD(Pointer, Pointer)
 }
 
 fn link(assembly: Assembly) -> Binary {
