@@ -2,18 +2,12 @@ mod memory;
 use memory::{Memory, Pointer};
 
 fn main() {
-    let mut memory = Memory::new();
-
-    let x = instruction(
-        &mut memory,
-        Pointer::new(0),
-        Pointer::new(0),
-        Pointer::new(3)
+    let code = "goto 2".to_owned();
+    let bin = link(
+        assemble(
+            compile(code)
+        )
     );
-    println!("{}",x.display());
-
-    let asm: Assembly = vec![[0,0,3],[1,1,3]];
-    let bin = link(asm);
     println!("{}", bin.to_string());
 }
 
@@ -24,6 +18,35 @@ fn instruction(memory: &mut Memory, a: Pointer, b: Pointer, c: Pointer) -> Point
         return c
     }
     return c.next()
+}
+
+fn compile(code: String) -> Vec<Instruction> {
+    let mut instructions: Vec<Instruction> = Vec::new();
+    let lines = code.split('\n')
+        .collect::<Vec<&str>>();
+
+    for line in lines {
+        let tokens = line.split(' ')
+            .collect::<Vec<&str>>();
+
+        for t in 0..tokens.len() {
+            match tokens[t] {
+                "goto" => {
+                    instructions.push(
+                        Instruction::GOTO(
+                            Pointer::new(
+                                tokens[t+1].parse::<u8>()
+                                    .expect("goto arg is not number of pointer")
+                            )
+                        )
+                    );
+                }
+                _ => {}
+            }
+        }
+    }
+
+    return instructions;
 }
 
 fn assemble(instructions: Vec<Instruction>) -> Assembly {
