@@ -13,6 +13,9 @@ impl Memory {
     pub fn set(&mut self, p: &Pointer, value: i8) {
         self.value[p.value as usize] = value;
     }
+    pub fn display(&self) {
+        println!("{:?}", self.value)
+    }
 }
 
 pub struct Pointer {
