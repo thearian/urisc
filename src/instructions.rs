@@ -2,7 +2,8 @@ use crate::{memory::Pointer, binary::Assembly};
 
 pub enum Instruction {
  GOTO(Pointer),
- ADD(Pointer, Pointer)
+ ADD(Pointer, Pointer),
+ SET(Pointer, u8)
 }
 
 pub fn compile(code: String) -> Vec<Instruction> {
@@ -39,6 +40,18 @@ pub fn compile(code: String) -> Vec<Instruction> {
                             )
                         )
                     );
+                },
+                "set" => {
+                    instructions.push(
+                        Instruction::SET(
+                            Pointer::new(
+                                tokens[t+1].parse::<u8>()
+                                    .expect("set arg is not number of pointer")
+                            ),
+                            tokens[t+2].parse::<u8>()
+                                .expect("set arg is not value number")
+                        )
+                    );
                 }
                 _ => {}
             }
@@ -54,18 +67,23 @@ pub fn assemble(instructions: Vec<Instruction>) -> Assembly {
         match ins {
             Instruction::GOTO(pointer) => {
                 assembly.push(
-                    [0, 0, pointer.reference()]
+                    [0, 0, pointer.reference(), 0, 0]
                 );
             }
             Instruction::ADD(a, b) => {
                 assembly = [
                     assembly,
                     vec![
-                        [a.reference(), 0, 0],
-                        [0, b.reference(), 0],
-                        [0, 0, 0]
+                        [a.reference(), 0, 0, 0, 0],
+                        [0, b.reference(), 0, 0, 0],
+                        [0, 0, 0, 0, 0]
                     ]
                 ].concat()
+            }
+            Instruction::SET(pointer, value) => {
+                assembly.push(
+                    [0, 0, 0, pointer.reference(), value]
+                );
             }
         };
     }

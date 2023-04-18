@@ -1,6 +1,6 @@
-use crate::memory::{Memory, Pointer, self};
+use crate::memory::{Memory, Pointer};
 
-pub type AssemblyItem = [u8; 3];
+pub type AssemblyItem = [u8; 5];
 pub type Assembly = Vec<AssemblyItem>;
 
 pub struct Binary {
@@ -31,7 +31,9 @@ pub fn link(assembly: Assembly) -> Binary {
             vec![
                 assembly_item[0],
                 assembly_item[1],
-                assembly_item[2]
+                assembly_item[2],
+                assembly_item[3],
+                assembly_item[4]
             ]
         )
     }
@@ -41,21 +43,34 @@ pub fn link(assembly: Assembly) -> Binary {
 
 pub fn run(bin: Binary) {
     let mut memory = Memory::new();
-    for i in (0..bin.value.len()).step_by(3) {
-        run_instruction(&mut memory,
-            Pointer::new(bin.value[i]),
-            Pointer::new(bin.value[i+1]),
-            Pointer::new(bin.value[i+2]),
+    let mut first_pointer = Some(
+        Pointer::new(bin.value[0])
+    );
+
+    while first_pointer.is_some() {
+        first_pointer = run_instruction(
+            &mut memory,
+            first_pointer.as_ref().unwrap(),
+            first_pointer.as_ref().unwrap()
+                .next().as_ref().unwrap(),
+            first_pointer.as_ref().unwrap()
+                .next().as_ref().unwrap()
+                .next().as_ref().unwrap()
         );
         memory.display();
     }
 }
 
-fn run_instruction(memory: &mut Memory, a: Pointer, b: Pointer, c: Pointer) -> Pointer {
-    let ac = memory.get(&b) - memory.get(&a);
+fn run_instruction(
+    memory: &mut Memory,
+    a: &Pointer, 
+    b: &Pointer,
+    c: &Pointer
+) -> Option<Pointer> {
+    let ac = memory.get(b) - memory.get(a);
     memory.set(&b, ac);
     if ac >= 0 {
-        return c
+        return Some(c.clone())
     }
     return c.next()
 }

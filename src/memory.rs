@@ -1,11 +1,11 @@
-pub const MEMORY_SIZE: u8 = 4;
+pub const MEMORY_SIZE: u8 = 16;
 
 pub struct Memory {
     value: [i8; MEMORY_SIZE as usize]
 }
 impl Memory {
     pub fn new() -> Memory {
-        Memory { value: [0,0,0,0] }
+        Memory { value: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] }
     }
     pub fn get(&self, p: &Pointer) -> i8 {
         self.value[p.value as usize]
@@ -18,6 +18,7 @@ impl Memory {
     }
 }
 
+#[derive(Clone)]
 pub struct Pointer {
     value: u8
 }
@@ -28,8 +29,12 @@ impl Pointer {
         }
         return Pointer { value }
     }
-    pub fn next(&self) -> Pointer {
-        Pointer { value: self.value + 1 }
+    pub fn next(&self) -> Option<Pointer> {
+        if self.value < MEMORY_SIZE {
+            Some(Pointer { value: self.value + 1 })
+        } else {
+            None
+        }
     }
     pub fn display(&self) -> String {
         format!("ptr {}", self.value)
