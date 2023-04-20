@@ -16,9 +16,22 @@ impl Memory {
     pub fn display(&self) {
         println!("{:?}", self.value)
     }
+    pub fn next_segment(&self, index: u8) -> Option<[Pointer; 4]> {
+        if index > (MEMORY_SIZE - 4) {
+            return None;
+        }
+        else {
+            let mut segment = [Pointer { value: 0 }; 4];
+            for i in index..(index + 4) {
+                segment[(i - index) as usize] = Pointer { value: i };
+            }
+
+            return Some(segment);
+        }
+    }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Pointer {
     value: u8
 }

@@ -67,22 +67,22 @@ pub fn assemble(instructions: Vec<Instruction>) -> Assembly {
         match ins {
             Instruction::GOTO(pointer) => {
                 assembly.push(
-                    [0, 0, pointer.reference(), 0, 0]
+                    [0, 0, 0, pointer.reference()]
                 );
             }
             Instruction::ADD(a, b) => {
                 assembly = [
                     assembly,
                     vec![
-                        [a.reference(), 0, 0, 0, 0],
-                        [0, b.reference(), 0, 0, 0],
-                        [0, 0, 0, 0, 0]
+                        [0, a.reference(), 0, 0],
+                        [0, 0,  b.reference(), 0],
+                        [0, 0, 0, 0]
                     ]
                 ].concat()
             }
             Instruction::SET(pointer, value) => {
                 assembly.push(
-                    [0, 0, 0, pointer.reference(), value]
+                    [1, pointer.reference(), value, 0]
                 );
             }
         };

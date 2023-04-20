@@ -1,6 +1,6 @@
 use crate::memory::{Memory, Pointer};
 
-pub type AssemblyItem = [u8; 5];
+pub type AssemblyItem = [u8; 4];
 pub type Assembly = Vec<AssemblyItem>;
 
 pub struct Binary {
@@ -33,7 +33,6 @@ pub fn link(assembly: Assembly) -> Binary {
                 assembly_item[1],
                 assembly_item[2],
                 assembly_item[3],
-                assembly_item[4]
             ]
         )
     }
@@ -43,26 +42,27 @@ pub fn link(assembly: Assembly) -> Binary {
 
 pub fn run(bin: Binary) {
     let mut memory = Memory::new();
-    let mut first_pointer = Some(
-        Pointer::new(bin.value[0])
-    );
+    let mut next_segment = memory.next_segment(0u8);
 
-    while first_pointer.is_some() {
-        first_pointer = run_instruction(
+    while next_segment.is_some() {
+        let segment = next_segment.unwrap();
+        let next_pointer = run_instruction(
             &mut memory,
-            first_pointer.as_ref().unwrap(),
-            first_pointer.as_ref().unwrap()
-                .next().as_ref().unwrap(),
-            first_pointer.as_ref().unwrap()
-                .next().as_ref().unwrap()
-                .next().as_ref().unwrap()
+            &segment[0],
+            &segment[1],
+            &segment[2],
+            &segment[3],
         );
         memory.display();
+        next_segment = memory.next_segment(
+            next_pointer.unwrap().reference()
+        );
     }
 }
 
 fn run_instruction(
     memory: &mut Memory,
+    ins: &Pointer, 
     a: &Pointer, 
     b: &Pointer,
     c: &Pointer
