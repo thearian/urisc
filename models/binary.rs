@@ -84,7 +84,7 @@ fn run_instruction(
     if ins.reference() == 0 {
         let ac = memory.get(b) - memory.get(a);
         memory.set(b, ac);
-        if ac >= 0 {
+        if ac <= 0 {
             return Some(c.clone())
         }
         return c.next()

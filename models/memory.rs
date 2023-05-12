@@ -1,4 +1,4 @@
-pub const MEMORY_SIZE: u8 = 32;
+pub const MEMORY_SIZE: u8 = 64;
 
 pub struct Memory {
     value: [i8; MEMORY_SIZE as usize]
@@ -66,23 +66,3 @@ impl Pointer {
     }
 }
 
-
-pub trait ToUriscPointer {
-    fn to_urisc_pointer(self) -> Pointer;
-}
-
-impl ToUriscPointer for u8 {
-    fn to_urisc_pointer(self) -> Pointer {
-        return Pointer::new(self);
-    }
-}
-
-impl ToUriscPointer for i8 {
-    fn to_urisc_pointer(self) -> Pointer {
-        if self > 0 {
-            return Pointer::new(self as u8);
-        } else {
-            return Pointer::new(0);
-        }
-    }
-}
