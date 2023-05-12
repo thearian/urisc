@@ -68,12 +68,8 @@ fn subleq(
     b:   &    Pointer,
     c:   &    Pointer,
 ) -> Option<Pointer> {
-    let bb = mem.get(&mem.get(&b).to_urisc_pointer());
-    let aa = mem.get(&mem.get(&a).to_urisc_pointer());
-
-    let ac = bb - aa;
-    mem.set(&mem.get(&b).to_urisc_pointer(), ac);
-    // mem.set(&b, ac);
+    let ac = mem.get_value_of(b) - mem.get_value_of(a);
+    mem.set_to_value_of(b, ac);
     if ac <= 0 {
         return Some(c.clone())
     }

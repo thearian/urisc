@@ -10,6 +10,9 @@ impl Memory {
     pub fn get(&self, p: &Pointer) -> i8 {
         self.value[p.value as usize]
     }
+    pub fn get_value_of(&self, p: &Pointer) -> i8 {
+        self.get(&self.get(&p).to_urisc_pointer())
+    }
     pub fn set(&mut self, p: &Pointer, value: i8) {
         if p.value < MEMORY_SIZE {
             self.value[p.value as usize] = value;
@@ -17,6 +20,12 @@ impl Memory {
         else {
             println!("memory warning: some SET was denied");
         }
+    }
+    pub fn set_to_value_of(&mut self, p: &Pointer, value: i8) {
+        self.set(
+            &self.get(&p).to_urisc_pointer(),
+            value
+        );
     }
     pub fn display(&self) {
         let s = self.value.iter()
