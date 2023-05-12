@@ -1,20 +1,29 @@
-pub const MEMORY_SIZE: u8 = 16;
+pub const MEMORY_SIZE: u8 = 64;
 
 pub struct Memory {
     value: [i8; MEMORY_SIZE as usize]
 }
 impl Memory {
     pub fn new() -> Memory {
-        Memory { value: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] }
+        Memory { value: [0;  MEMORY_SIZE as usize] }
     }
     pub fn get(&self, p: &Pointer) -> i8 {
         self.value[p.value as usize]
     }
     pub fn set(&mut self, p: &Pointer, value: i8) {
-        self.value[p.value as usize] = value;
+        if p.value < MEMORY_SIZE {
+            self.value[p.value as usize] = value;
+        }
+        else {
+            println!("memory warning: some SET was denied");
+        }
     }
     pub fn display(&self) {
-        println!("{:?}", self.value)
+        let s = self.value.iter()
+            .map(|num| { num.to_string() })
+            .collect::<Vec<String>>()
+            .join(" ");
+        println!("mem {}", s);
     }
     pub fn next_segment(&self, index: u8) -> Option<[Pointer; 4]> {
         if index > (MEMORY_SIZE - 4) {

@@ -8,7 +8,7 @@ pub enum Instruction {
 
 pub fn compile(code: String) -> Vec<Instruction> {
     let mut instructions: Vec<Instruction> = Vec::new();
-    let lines = code.split('\n')
+    let lines = code.split("\r\n")
         .collect::<Vec<&str>>();
 
     for line in lines {

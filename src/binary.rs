@@ -21,6 +21,17 @@ impl Binary {
     pub fn append(&mut self, value: Vec<u8>) {
         self.value = [self.value.clone(), value].concat();
     }
+    pub fn write_to_memory(&self, memory: &mut Memory) {
+        for (i, bit) in self.value.iter().enumerate() {
+            memory.set(
+                &Pointer::new(i as u8),
+                *bit as i8
+            );
+        }
+    }
+    pub fn last_bit(&self) -> u8 {
+        self.value.len() as u8
+    }
 }
 
 pub fn link(assembly: Assembly) -> Binary {
@@ -42,10 +53,13 @@ pub fn link(assembly: Assembly) -> Binary {
 
 pub fn run(bin: Binary) {
     let mut memory = Memory::new();
-    let mut next_segment = memory.next_segment(0u8);
+    bin.write_to_memory(&mut memory);
 
-    while next_segment.is_some() {
-        let segment = next_segment.unwrap();
+    let mut next_segment = memory.next_segment(0u8);
+    memory.display();
+
+    while let Some(segment) = next_segment {
+        std::thread::sleep_ms(200);
         let next_pointer = run_instruction(
             &mut memory,
             &segment[0],
@@ -67,10 +81,15 @@ fn run_instruction(
     b: &Pointer,
     c: &Pointer
 ) -> Option<Pointer> {
-    let ac = memory.get(b) - memory.get(a);
-    memory.set(&b, ac);
-    if ac >= 0 {
-        return Some(c.clone())
+    if ins.reference() == 0 {
+        let ac = memory.get(b) - memory.get(a);
+        memory.set(b, ac);
+        if ac >= 0 {
+            return Some(c.clone())
+        }
+        return c.next()
+    } else {
+        memory.set(a, b.reference() as i8);
+        return c.next();
     }
-    return c.next()
 }
