@@ -1,8 +1,36 @@
 mod memory;
 use memory::{Memory, Pointer, ToUriscPointer};
 
-fn main() {
+fn test_move() {
+    let mut mem = Memory::new();
+    // DATA SEGMENT
+    mem.set(&Pointer::new(1), 2i8);
+    mem.set(&Pointer::new(2), 3i8);
 
+    // CODE SEGMENT
+    mem.set(&Pointer::new(3), 2i8);
+    mem.set(&Pointer::new(4), 2i8);
+
+    mem.set(&Pointer::new(5), 1i8);
+    mem.set(&Pointer::new(6), 0i8);
+
+    mem.set(&Pointer::new(7), 0i8);
+    mem.set(&Pointer::new(8), 2i8);
+
+    mem.set(&Pointer::new(9), 0i8);
+    mem.set(&Pointer::new(10), 0i8);
+
+    let mut ins = Pointer::new(3);
+    for _ in 0..4 {
+        mem.display();
+
+        ins = subleq(&mut mem,
+            &ins,
+            &ins.next().unwrap(),
+            &ins.next().unwrap().next().unwrap()
+        ).unwrap();
+    }
+    mem.display();
 }
 
 fn test_add() {
@@ -46,9 +74,6 @@ fn subleq(
     let ac = bb - aa;
     mem.set(&mem.get(&b).to_urisc_pointer(), ac);
     // mem.set(&b, ac);
-    println!("{} {} {}, {}-{}={}",a.display(),b.display(),c.display()
-        , bb, aa
-        ,ac);
     if ac <= 0 {
         return Some(c.clone())
     }
