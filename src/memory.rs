@@ -7,6 +7,13 @@ impl Memory {
     pub fn new() -> Memory {
         Memory { value: [0;  MEMORY_SIZE as usize] }
     }
+    pub fn insert(&mut self, bin: Vec<i8>) {
+        let mut index = 1;
+        for ins in bin {
+            self.set(&Pointer::new(index), ins);
+            index += 1;
+        }
+    }
     pub fn get(&self, p: &Pointer) -> i8 {
         self.value[p.value as usize]
     }
